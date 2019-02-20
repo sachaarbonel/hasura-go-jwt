@@ -40,10 +40,10 @@ func (b customClaimsBuilder) NotBefore(notBefore int64) customClaimsBuilder {
 	return builder.Set(b, "NotBefore", notBefore).(customClaimsBuilder)
 }
 
-func (b customClaimsBuilder) Build(jsonKey string) CustomClaims { //Get
+func (b customClaimsBuilder) Build(jsonKey string, customClaims interface{}) CustomClaims { //Get
 	standardClaims := builder.GetStruct(b).(jwt.StandardClaims)
 	customClaimsI := map[string]interface{}{
-		jsonKey: HasuraClaims{},
+		jsonKey: customClaims,
 	}
 	return CustomClaims{
 		StandardClaims: standardClaims,
