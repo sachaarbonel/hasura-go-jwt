@@ -50,9 +50,9 @@ func main() {
 	ss, _ := token.SignedString(mySigningKey)
 	fmt.Printf("%v\n", ss)
 
-	tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTYyMzkwMjIsImlzcyI6InRlc3QiLCJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsidXNlciIsImVkaXRvciJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJ1c2VyIiwieC1oYXN1cmEtdXNlci1pZCI6IiIsIngtaGFzdXJhLW9yZy1pZCI6Ik1USXpORFUyTnpnNU1BPT0iLCJ4LWhhc3VyYS1jdXN0b20iOiJjdXN0b20tdmFsdWUifX0.5etS2jE6D4G4n92UKt4mGwuT1KiPBOfJl1Jgso3MxsQ"
+	//tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTYyMzkwMjIsImlzcyI6InRlc3QiLCJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsidXNlciIsImVkaXRvciJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJ1c2VyIiwieC1oYXN1cmEtdXNlci1pZCI6IiIsIngtaGFzdXJhLW9yZy1pZCI6Ik1USXpORFUyTnpnNU1BPT0iLCJ4LWhhc3VyYS1jdXN0b20iOiJjdXN0b20tdmFsdWUifX0.5etS2jE6D4G4n92UKt4mGwuT1KiPBOfJl1Jgso3MxsQ"
 	at(time.Unix(0, 0), func() {
-		token, err := jwt.ParseWithClaims(tokenString, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(ss, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return []byte(mySigningKey), nil
 		})
 
