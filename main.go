@@ -21,13 +21,11 @@ func main() {
 	// if err := json.Unmarshal(byt, &dat); err != nil {
 	// 	panic(err)
 	// }
-	dat := map[string]interface{}{
-		"https://hasura.io/jwt/claims": HTTPSHasuraIoJwtClaims{},
-	}
+
 	customClaims := builder.CustomClaimsBuilder.
 		Subject("1234").
 		ExpiresAt(01234).
-		Build(dat)
+		Build("https://hasura.io/jwt/claims")
 	fmt.Println(customClaims)
 
 }
