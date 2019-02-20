@@ -7,7 +7,7 @@ import (
 
 type CustomClaims struct {
 	StandardClaims jwt.StandardClaims
-	CustomClaimsI  interface{}
+	CustomClaimsI  map[string]interface{}
 }
 
 type customClaimsBuilder builder.Builder
@@ -28,7 +28,7 @@ func (b customClaimsBuilder) ID(ID string) customClaimsBuilder {
 	return builder.Set(b, "ID", ID).(customClaimsBuilder)
 }
 
-func (b customClaimsBuilder) IssuedAt(issuedAt string) customClaimsBuilder {
+func (b customClaimsBuilder) IssuedAt(issuedAt int64) customClaimsBuilder {
 	return builder.Set(b, "IssuedAt", issuedAt).(customClaimsBuilder)
 }
 
@@ -40,7 +40,7 @@ func (b customClaimsBuilder) NotBefore(notBefore int64) customClaimsBuilder {
 	return builder.Set(b, "NotBefore", notBefore).(customClaimsBuilder)
 }
 
-func (b customClaimsBuilder) Build(customClaimsI interface{}) CustomClaims { //Get
+func (b customClaimsBuilder) Build(customClaimsI map[string]interface{}) CustomClaims { //Get
 	standardClaims := builder.GetStruct(b).(jwt.StandardClaims)
 	return CustomClaims{
 		StandardClaims: standardClaims,
