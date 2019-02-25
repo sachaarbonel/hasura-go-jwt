@@ -1,6 +1,8 @@
 package builder
 
 import (
+	"encoding/base64"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/lann/builder"
 )
@@ -13,7 +15,7 @@ type CustomClaims struct {
 type customClaimsBuilder builder.Builder
 
 func (b customClaimsBuilder) Subject(subject string) customClaimsBuilder {
-	return builder.Set(b, "Subject", subject).(customClaimsBuilder)
+	return builder.Set(b, "Subject", base64.StdEncoding.EncodeToString([]byte(subject))).(customClaimsBuilder)
 }
 
 func (b customClaimsBuilder) Audience(audience string) customClaimsBuilder {

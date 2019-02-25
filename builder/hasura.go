@@ -36,7 +36,7 @@ func (b hasuraClaimsBuilder) Custom(custom string) hasuraClaimsBuilder {
 	return builder.Set(b, "Custom", custom).(hasuraClaimsBuilder)
 }
 
-func (b hasuraClaimsBuilder) Build() HasuraClaims { //Get
+func (b hasuraClaimsBuilder) Build() HasuraClaims {
 	return builder.GetStruct(b).(HasuraClaims)
 }
 
