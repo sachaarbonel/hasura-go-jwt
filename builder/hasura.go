@@ -9,6 +9,7 @@ import (
 type HasuraClaims struct {
 	AllowedRoles []string `json:"x-hasura-allowed-roles"`
 	DefaultRole  string   `json:"x-hasura-default-role"`
+	Role         string   `json:"x-hasura-role"`
 	UserID       string   `json:"x-hasura-user-id"`
 	OrgID        string   `json:"x-hasura-org-id"`
 	Custom       string   `json:"x-hasura-custom"`
@@ -22,6 +23,10 @@ func (b hasuraClaimsBuilder) AddRole(allowedRole string) hasuraClaimsBuilder {
 
 func (b hasuraClaimsBuilder) DefaultRole(defaultRole string) hasuraClaimsBuilder {
 	return builder.Set(b, "DefaultRole", defaultRole).(hasuraClaimsBuilder)
+}
+
+func (b hasuraClaimsBuilder) Role(role string) hasuraClaimsBuilder {
+	return builder.Set(b, "Role", role).(hasuraClaimsBuilder)
 }
 
 func (b hasuraClaimsBuilder) UserID(userID string) hasuraClaimsBuilder {
