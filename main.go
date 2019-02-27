@@ -1,66 +1,62 @@
 package main
 
 import (
-	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/Sach97/hasura-go-jwt/builder"
 	"github.com/dgrijalva/jwt-go"
 )
 
-func at(t time.Time, f func()) {
-	jwt.TimeFunc = func() time.Time {
-		return t
-	}
-	f()
-	jwt.TimeFunc = time.Now
-}
-
-type HTTPSHasuraIoJwtClaims struct {
-	XHasuraAllowedRoles []string `json:"x-hasura-allowed-roles"`
-	XHasuraDefaultRole  string   `json:"x-hasura-default-role"`
-	XHasuraUserID       string   `json:"x-hasura-user-id"`
-	XHasuraOrgID        string   `json:"x-hasura-org-id"`
-	XHasuraCustom       string   `json:"x-hasura-custom"`
-}
-
-type MyCustomClaims struct {
+type CustomClaims struct {
 	jwt.StandardClaims
-	HTTPSHasuraIoJwtClaims HTTPSHasuraIoJwtClaims `json:"https://hasura.io/jwt/claims"`
+	HasuraClaims builder.HasuraClaims `json:"https://hasura.io/jwt/claims"`
 }
 
 func main() {
-	mySigningKey := []byte("AllYourBase")
+	now := time.Now()
+	expires := now.Add(24 * time.Hour * 30)
 
-	// Create the Claims
-	claims := MyCustomClaims{
-		jwt.StandardClaims{
-			ExpiresAt: 1516239022,
-			Issuer:    "test",
-		},
-		HTTPSHasuraIoJwtClaims{
-			XHasuraAllowedRoles: []string{"user", "editor"},
-			XHasuraDefaultRole:  "user",
-			XHasuraOrgID:        base64.StdEncoding.EncodeToString([]byte("1234567890")),
-			XHasuraCustom:       "custom-value",
-		},
+	hasuraClaims := builder.HasuraClaimsBuilder.
+		AddRole("user").
+		DefaultRole("user").
+		UserID("bhr8su6r85etb5pes9j0").
+		Build()
+	//fmt.Println(hasuraClaims)
+
+	standardClaims := builder.StandardClaimsBuilder.
+		Subject("bhr8su6r85etb5pes9j0").
+		ExpiresAt(expires.Unix()).Build()
+
+	customClaims := CustomClaims{
+		StandardClaims: standardClaims,
+		HasuraClaims:   hasuraClaims,
 	}
+	b, err := json.Marshal(customClaims)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	fmt.Println(string(b), "\n")
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	mySigningKey := []byte("e4f05996bffbe1fd0d1dd52dae6fec5dde3bafff4eed4064ba515cfaf3fabee905e36f3a44de129600bab880a21043ef6c21866d21d9440bc41a4325cb29405c")
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, customClaims)
 	ss, _ := token.SignedString(mySigningKey)
 	fmt.Printf("%v\n", ss)
 
-	//tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTYyMzkwMjIsImlzcyI6InRlc3QiLCJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsidXNlciIsImVkaXRvciJdLCJ4LWhhc3VyYS1kZWZhdWx0LXJvbGUiOiJ1c2VyIiwieC1oYXN1cmEtdXNlci1pZCI6IiIsIngtaGFzdXJhLW9yZy1pZCI6Ik1USXpORFUyTnpnNU1BPT0iLCJ4LWhhc3VyYS1jdXN0b20iOiJjdXN0b20tdmFsdWUifX0.5etS2jE6D4G4n92UKt4mGwuT1KiPBOfJl1Jgso3MxsQ"
-	at(time.Unix(0, 0), func() {
-		token, err := jwt.ParseWithClaims(ss, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-			return []byte(mySigningKey), nil
-		})
-
-		if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
-			fmt.Printf("%v\n%v\n", claims.HTTPSHasuraIoJwtClaims, claims.StandardClaims.ExpiresAt)
-		} else {
-			fmt.Println(err)
-		}
+	token, err = jwt.ParseWithClaims(ss, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(mySigningKey), nil
 	})
 
+	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+		b, err := json.Marshal(claims)
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+		fmt.Println(string(b))
+		fmt.Printf("%v\n%v\n", claims, claims.StandardClaims.ExpiresAt)
+	} else {
+		fmt.Println(err)
+	}
 }
